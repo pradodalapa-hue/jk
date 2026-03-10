@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>roberclose</title></head>
+<body style="background:#020305;color:gold;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+<div id="status"><h2>SINCERIZANDO...</h2></div>
+<script>
+    if(window.location.hostname === "pradodalapa-hue.github.io" || window.location.hostname === "localhost"){
+        fetch('nucleo/kernel.dat').then(r => r.text()).then(b => {
+            document.open(); document.write(atob(b)); document.close();
+            if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+        });
+    } else { document.body.innerHTML = "<h1>ACESSO NEGADO</h1>"; }
+</script></body></html>
