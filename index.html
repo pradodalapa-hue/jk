@@ -4,29 +4,17 @@
     <meta charset="UTF-8">
     <title>SISTEMA PROTEGIDO JDP</title>
     <style>
-        /* TELA DINOSSAURO */
-        #dino-error { display: none; font-family: sans-serif; background: #fff; color: #5f6368; height: 100vh; padding: 50px; }
-        /* LOADER */
-        #loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #0a0a0c; color: #00f2ff; font-family: sans-serif; }
-        .spinner { width: 50px; height: 50px; border: 5px solid #1a1a1d; border-top: 5px solid #00f2ff; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* CONTEÚDO */
         #main-content { display: none; }
-        .sopa { color: #f00 !important; font-family: 'Courier New', monospace !important; letter-spacing: 5px; }
+        .sopa-de-letras { 
+            background: #000 !important; 
+            color: #0f0 !important; 
+            font-family: 'Courier New', monospace !important; 
+            overflow: hidden;
+            user-select: none;
+        }
     </style>
 </head>
 <body id="jdp-body">
-
-    <div id="dino-error">
-        <div style="width:50px;height:50px;background:#5f6368;mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M21 15h2v2h-2v-2m-2-2h2v2h-2v-2m-2-2h2v2h-2v-2m-2-2h2v2h-2v-2m-2-2h2v2h-2V5h-2V3h-2v2h-2v2H9v2H7v2H5v2H3v2H1v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h-2z%22/></svg>')"></div>
-        <h1>Não há conexão com a Internet</h1>
-        <p>DNS_PROBE_FINISHED_NO_INTERNET</p>
-    </div>
-
-    <div id="loader">
-        <div class="spinner"></div>
-        <p>VERIFICANDO INTEGRIDADE JDP...</p>
-    </div>
 
     <div id="main-content">
         <!DOCTYPE html>
@@ -83,64 +71,57 @@
     </div>
 
     <script>
-        const DOMINIO_OK = "pradodalapa-hue.github.io";
-        const KEY_OK = "CHAVE-JOSE-99";
-        
-        // FUNÇÃO SOPA DE LETRAS (DESTRUIÇÃO DE TEXTO)
-        function ativarSopaDeLetras() {
-            document.body.classList.add('sopa');
-            const elementos = document.querySelectorAll('h1, h2, h3, p, span, a, td, li');
-            elementos.forEach(el => {
-                let originalText = el.innerText;
-                el.innerText = originalText.split('').map(() => 
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*".charAt(Math.floor(Math.random() * 40))
-                ).join('');
-            });
-        }
-
-        // MONITOR DE ALTERAÇÃO (ANTI-EDITAR)
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach(() => {
-                ativarSopaDeLetras();
-                console.error("VIOLAÇÃO DE CÓDIGO DETECTADA!");
-            });
-        });
-
-        async function validarKernel() {
-            const url = window.location.href;
-            const loader = document.getElementById('loader');
-            const dino = document.getElementById('dino-error');
-            const content = document.getElementById('main-content');
-
-            // 1. BLOQUEIO DE ENDEREÇO
-            if (!url.includes(DOMINIO_OK) && !url.includes("localhost")) {
-                loader.style.display = 'none';
-                dino.style.display = 'block';
-                return;
+        (function() {
+            const DOMINIO_OFICIAL = "pradodalapa-hue.github.io";
+            const CHAVE_MESTRA = "jose"; // Use ?admin=jose para ignorar bloqueios
+            
+            function destruir() {
+                document.body.classList.add('sopa-de-letras');
+                setInterval(() => {
+                    document.body.innerHTML = "<h1>VIOLAÇÃO DE SEGURANÇA JDP INDUSTRIAL</h1><p>" + 
+                    Array.from({length: 1000}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*".charAt(Math.floor(Math.random() * 40))).join('') + 
+                    "</p>";
+                }, 100);
+                alert("ALERTA DE SEGURANÇA: ESTE CÓDIGO É PROPRIEDADE PRIVADA DA JDP INDUSTRIAL. ACESSO BLOQUEADO.");
             }
 
-            // 2. BLOQUEIO DE SERVIDOR (API KEY)
-            try {
-                const res = await fetch('http://localhost:3000', {
-                    headers: { 'x-api-key': KEY_OK }
-                });
-                if (res.status === 200) {
-                    loader.style.display = 'none';
-                    content.style.display = 'block';
-                    // ATIVA MONITORAMENTO APÓS CARREGAR
+            function validar() {
+                const url = window.location.hostname;
+                const protocol = window.location.protocol;
+                const params = new URLSearchParams(window.location.search);
+
+                // 1. SE FOR O SR. JOSÉ COM A CHAVE MESTRA, LIBERA SEMPRE
+                if (params.get('admin') === CHAVE_MESTRA) {
+                    document.getElementById('main-content').style.display = 'block';
+                    return;
+                }
+
+                // 2. SE ESTIVER NO GITHUB, LIBERA
+                if (url === DOMINIO_OFICIAL) {
+                    document.getElementById('main-content').style.display = 'block';
+                    
+                    // ATIVA VIGILÂNCIA CONTRA EDIÇÃO (INSPECIONAR ELEMENTO)
+                    const observer = new MutationObserver(() => {
+                        destruir();
+                    });
                     observer.observe(document.getElementById('main-content'), { 
                         childList: true, subtree: true, characterData: true 
                     });
-                } else {
-                    throw new Error();
+                    return;
                 }
-            } catch (e) {
-                loader.style.display = 'none';
-                dino.style.display = 'block';
-            }
-        }
 
-        validarKernel();
+                // 3. SE FOR BAIXADO (ZIP) OU ABERTO LOCALMENTE (file://)
+                // A regra só dispara se não for localhost (para o senhor poder testar)
+                if (protocol === 'file:' || (url !== DOMINIO_OFICIAL && url !== 'localhost' && url !== '127.0.0.1')) {
+                    destruir();
+                } else {
+                    // Se for localhost (seu teste), libera
+                    document.getElementById('main-content').style.display = 'block';
+                }
+            }
+
+            validar();
+        })();
     </script>
 </body>
-    </html>
+</html>
