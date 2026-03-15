@@ -1,19 +1,146 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SISTEMA JDP</title></head>
-<body style="background:#020305;margin:0;display:flex;align-items:center;justify-content:center;height:100vh;color:gold;font-family:sans-serif;">
-<div id="status"><h2>CONECTANDO AO NÚCLEO...</h2></div>
-<script>
-    const d = window.location.hostname;
-    const o = "pradodalapa-hue.github.io";
-    // SÓ LIBERA SE ESTIVER NO SEU DOMÍNIO OFICIAL
-    if(d === o || d === "localhost"){
-        fetch('nucleo/kernel.dat').then(r => r.text()).then(b => {
-            document.open();
-            document.write(atob(b));
-            document.close();
-        }).catch(() => {
-            document.getElementById('status').innerHTML = "<h2 style='color:red;'>ERRO DE SINCRONIA</h2>";
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>SISTEMA PROTEGIDO JDP</title>
+    <style>
+        /* TELA DINOSSAURO */
+        #dino-error { display: none; font-family: sans-serif; background: #fff; color: #5f6368; height: 100vh; padding: 50px; }
+        /* LOADER */
+        #loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #0a0a0c; color: #00f2ff; font-family: sans-serif; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #1a1a1d; border-top: 5px solid #00f2ff; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* CONTEÚDO */
+        #main-content { display: none; }
+        .sopa { color: #f00 !important; font-family: 'Courier New', monospace !important; letter-spacing: 5px; }
+    </style>
+</head>
+<body id="jdp-body">
+
+    <div id="dino-error">
+        <div style="width:50px;height:50px;background:#5f6368;mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M21 15h2v2h-2v-2m-2-2h2v2h-2v-2m-2-2h2v2h-2v-2m-2-2h2v2h-2v-2m-2-2h2v2h-2V5h-2V3h-2v2h-2v2H9v2H7v2H5v2H3v2H1v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h-2z%22/></svg>')"></div>
+        <h1>Não há conexão com a Internet</h1>
+        <p>DNS_PROBE_FINISHED_NO_INTERNET</p>
+    </div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>VERIFICANDO INTEGRIDADE JDP...</p>
+    </div>
+
+    <div id="main-content">
+        <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JDP CLIENT - SUPREME</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: white; font-family: 'Rajdhani', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        .card { background: #0a0a0a; border: 2px solid #bf953f; padding: 40px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(191,149,63,0.2); position: relative; }
+        
+        input { width: 100%; padding: 15px; margin: 15px 0; background: #000; border: 1px solid #333; color: #00f2ff; text-align: center; font-size: 1.5rem; font-family: 'Orbitron'; box-sizing: border-box; }
+        input:focus { border-color: #bf953f; outline: none; }
+
+        button { width: 100%; padding: 20px; background: #bf953f; border: none; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        button:active { transform: scale(0.95); }
+        
+        .pulse { animation: pulse-gold 2s infinite; }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(191,149,63,0.7); } 70% { box-shadow: 0 0 0 15px rgba(191,149,63,0); } 100% { box-shadow: 0 0 0 0 rgba(191,149,63,0); } }
+        
+        #status-msg { font-size: 0.7rem; color: #555; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="step1">
+        <h2 style="font-family:'Orbitron'; color:#bf953f; margin-bottom:30px;">JDP INDUSTRIAL</h2>
+        <input type="text" id="nome" placeholder="NOME DO OPERADOR">
+        <button onclick="solicitarAcesso()">SOLICITAR ACESSO</button>
+        <div id="status-msg">Aguardando comando...</div>
+    </div>
+
+    <div class="card hidden" id="step2">
+        <h2 style="font-family:'Orbitron'; color:#bf953f;">VALIDAÇÃO</h2>
+        <p style="font-size: 0.8rem; color: #888;">AGUARDANDO INJEÇÃO DE CÓDIGO...</p>
+        <input type="number" id="input-code" placeholder="000000" readonly>
+        <button id="btn-entrar" onclick="finalizar()" style="background: #333; color: #666;" disabled>AGUARDANDO...</button>
+    </div>
+
+    <div class="card hidden" id="step3">
+        <h1 style="color:#00f2ff; font-family:'Orbitron';">ACESSO TOTAL</h1>
+        <div style="font-size: 5rem;">🔓</div>
+        <p>SISTEMA JDP LIBERADO.</p>
+    </div>
+
+    
+</body>
+</html>
+
+    </div>
+
+    <script>
+        const DOMINIO_OK = "pradodalapa-hue.github.io";
+        const KEY_OK = "CHAVE-JOSE-99";
+        
+        // FUNÇÃO SOPA DE LETRAS (DESTRUIÇÃO DE TEXTO)
+        function ativarSopaDeLetras() {
+            document.body.classList.add('sopa');
+            const elementos = document.querySelectorAll('h1, h2, h3, p, span, a, td, li');
+            elementos.forEach(el => {
+                let originalText = el.innerText;
+                el.innerText = originalText.split('').map(() => 
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*".charAt(Math.floor(Math.random() * 40))
+                ).join('');
+            });
+        }
+
+        // MONITOR DE ALTERAÇÃO (ANTI-EDITAR)
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach(() => {
+                ativarSopaDeLetras();
+                console.error("VIOLAÇÃO DE CÓDIGO DETECTADA!");
+            });
         });
-    } else {
-        document.body.innerHTML = "<h1 style='color:red;'>ACESSO NEGADO: CÓPIA NÃO AUTORIZADA</h1>";
-    }
-</script></body></html>
+
+        async function validarKernel() {
+            const url = window.location.href;
+            const loader = document.getElementById('loader');
+            const dino = document.getElementById('dino-error');
+            const content = document.getElementById('main-content');
+
+            // 1. BLOQUEIO DE ENDEREÇO
+            if (!url.includes(DOMINIO_OK) && !url.includes("localhost")) {
+                loader.style.display = 'none';
+                dino.style.display = 'block';
+                return;
+            }
+
+            // 2. BLOQUEIO DE SERVIDOR (API KEY)
+            try {
+                const res = await fetch('http://localhost:3000', {
+                    headers: { 'x-api-key': KEY_OK }
+                });
+                if (res.status === 200) {
+                    loader.style.display = 'none';
+                    content.style.display = 'block';
+                    // ATIVA MONITORAMENTO APÓS CARREGAR
+                    observer.observe(document.getElementById('main-content'), { 
+                        childList: true, subtree: true, characterData: true 
+                    });
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                loader.style.display = 'none';
+                dino.style.display = 'block';
+            }
+        }
+
+        validarKernel();
+    </script>
+</body>
+    </html>
